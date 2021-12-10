@@ -9,9 +9,15 @@ import { IdeaModule } from './idea/idea.module';
 import { config } from './orm.config';
 import { HttpErrorFilter } from './shared/http-error.filter';
 import { LoggingInterceptor } from './shared/logging.interceptor';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config), ConfigModule.forRoot(), IdeaModule],
+  imports: [
+    TypeOrmModule.forRoot(config),
+    ConfigModule.forRoot(),
+    IdeaModule,
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
