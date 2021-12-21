@@ -9,6 +9,7 @@ export const config: TypeOrmModuleOptions = {
   host: 'localhost',
   database: 'ideas',
   synchronize: true,
+  // dropSchema: true,
   logging: true,
   entities: ['src/**/*.entity.ts', 'dist/**/*.entity.ts'],
 };
