@@ -1,15 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Stripe from 'stripe';
 
 import { UserDTO, UserRO } from './user.dto';
 import { UserEntity } from './user.entity';
+import { STRIPE_CLIENT } from '../stripe/constants';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @Inject(STRIPE_CLIENT) private stripe: Stripe,
   ) {}
 
   async showAll(page = 1): Promise<UserRO[]> {
@@ -50,5 +53,29 @@ export class UserService {
     user = this.userRepository.create(data);
     await this.userRepository.save(user);
     return user.toResponseObject();
+  }
+
+  checkout() {
+    return this.stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: 'inr',
+            product_data: {
+              name: 'T-shirt',
+            },
+            unit_amount: 2000,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'http://localhost:4242/success.html',
+      cancel_url: 'http://localhost:4242/cancel.html',
+    });
+  }
+
+  getStripeCustomers() {
+    return this.stripe.customers.list();
   }
 }

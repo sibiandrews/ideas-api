@@ -5,7 +5,7 @@ import {
   Mutation,
   Parent,
   Query,
-  ResolveProperty,
+  ResolveField,
   Resolver,
 } from '@nestjs/graphql';
 import { AuthGuard } from '../shared/auth.guard';
@@ -55,7 +55,7 @@ export class UserResolver {
     return this.userService.register(user);
   }
 
-  @ResolveProperty()
+  @ResolveField()
   comments(@Parent() user: any) {
     const { id } = user;
     return this.commentService.showByUser(id);

@@ -5,7 +5,7 @@ import {
   Mutation,
   Parent,
   Query,
-  ResolveProperty,
+  ResolveField,
   Resolver,
 } from '@nestjs/graphql';
 
@@ -91,7 +91,7 @@ export class IdeaResolver {
     return await this.ideaService.unbookmark(id, userId);
   }
 
-  @ResolveProperty()
+  @ResolveField()
   comments(@Parent() idea: any) {
     const { id } = idea;
     return this.commentService.showByIdea(id);

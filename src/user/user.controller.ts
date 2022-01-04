@@ -23,6 +23,18 @@ export class UserController {
     return this.userService.showAll(page);
   }
 
+  @Get('checkout')
+  @UseGuards(new AuthGuard())
+  checkout() {
+    return this.userService.checkout();
+  }
+
+  @Get('api/stripecustomers')
+  @UseGuards(new AuthGuard())
+  getStripeCustomers() {
+    return this.userService.getStripeCustomers();
+  }
+
   @Post('login')
   @UsePipes(new ValidationPipe())
   login(@Body() data: UserDTO) {
