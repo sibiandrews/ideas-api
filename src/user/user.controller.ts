@@ -23,6 +23,12 @@ export class UserController {
     return this.userService.showAll(page);
   }
 
+  @Get('api/users/count')
+  @UseGuards(new AuthGuard())
+  getCount() {
+    return this.userService.getUserCount();
+  }
+
   @Get('checkout')
   @UseGuards(new AuthGuard())
   checkout() {

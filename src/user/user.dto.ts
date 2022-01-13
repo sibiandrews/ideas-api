@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { PhotoEntity } from 'src/photo/photo.entity';
 import { IdeaEntity } from '../idea/idea.entity';
 
 export class UserDTO {
@@ -16,4 +17,5 @@ export class UserRO {
   token?: string;
   ideas?: IdeaEntity[];
   bookmarks?: IdeaEntity[];
+  photos?: PhotoEntity[];
 }

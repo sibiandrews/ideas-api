@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
 import { ImagesModule } from './images/images.module';
 import { StripeModule } from './stripe/stripe.module';
+import { PhotoModule } from './photo/photo.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StripeModule } from './stripe/stripe.module';
     CommentModule,
     ImagesModule,
     StripeModule.forRoot(process.env.STRIPE_KEY, { apiVersion: '2020-08-27' }),
+    PhotoModule,
   ],
   controllers: [AppController],
   providers: [

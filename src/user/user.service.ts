@@ -55,6 +55,10 @@ export class UserService {
     return user.toResponseObject();
   }
 
+  async getUserCount(): Promise<number> {
+    return this.userRepository.count();
+  }
+
   checkout() {
     return this.stripe.checkout.sessions.create({
       line_items: [

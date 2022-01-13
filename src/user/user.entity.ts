@@ -13,6 +13,7 @@ import * as jwt from 'jsonwebtoken';
 
 import { UserRO } from './user.dto';
 import { IdeaEntity } from '../idea/idea.entity';
+import { PhotoEntity } from '../photo/photo.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -33,6 +34,9 @@ export class UserEntity {
 
   @OneToMany(type => IdeaEntity, idea => idea.author)
   ideas: IdeaEntity[];
+
+  @OneToMany(type => PhotoEntity, photo => photo.author)
+  photos: PhotoEntity[];
 
   @ManyToMany(type => IdeaEntity, { cascade: true })
   @JoinTable()
