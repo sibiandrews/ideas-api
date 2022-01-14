@@ -1,14 +1,18 @@
-import { UserEntity } from '../user/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+import { UserEntity } from '../user/user.entity';
+import { PhotoMetadataEntity } from './photoMetadata.entity';
+
+export const PHOTO_NAME_LENGTH = 100;
+@Entity('photo')
 export class PhotoEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -19,7 +23,7 @@ export class PhotoEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @Column({ length: 100 })
+  @Column({ length: PHOTO_NAME_LENGTH })
   name: string;
 
   @Column('text')
@@ -33,6 +37,11 @@ export class PhotoEntity {
 
   @Column()
   isPublished: boolean;
+
+  @OneToOne(type => PhotoMetadataEntity, metadata => metadata.photo, {
+    cascade: true,
+  })
+  metadata: PhotoMetadataEntity;
 
   @ManyToOne(type => UserEntity, author => author.photos)
   author: UserEntity;

@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { UserEntity } from '../user/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PhotoDTO, PhotoRO } from './photo.dto';
 import { PhotoEntity } from './photo.entity';
 
@@ -29,12 +30,13 @@ export class PhotoService {
   }
 
   async showAll(page = 1, newest?: boolean): Promise<PhotoRO[]> {
-    const photos = await this.photoRepository.find({
-      relations: ['author'],
-      take: 25,
-      skip: 25 * (page - 1),
-      order: newest && { created: 'DESC' },
-    });
+    let query: SelectQueryBuilder<PhotoEntity> = this.photoRepository
+      .createQueryBuilder('photo')
+      .innerJoinAndSelect('photo.metadata', 'metadata')
+      .innerJoinAndSelect('photo.author', 'author');
+    if (newest) query = query.orderBy('photo.created', 'DESC');
+    query = query.skip(25 * (page - 1)).take(25);
+    const photos = await query.getMany();
     return photos.map(photo => this.toResponseObject(photo));
   }
 
@@ -48,7 +50,7 @@ export class PhotoService {
   async read(id: string): Promise<PhotoRO> {
     const photo = await this.photoRepository.findOne({
       where: { id },
-      relations: ['author'],
+      relations: ['author', 'metadata'],
     });
     if (!photo) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);

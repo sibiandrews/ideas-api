@@ -10,6 +10,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+
 import { AuthGuard } from '../shared/auth.guard';
 import { ValidationPipe } from '../shared/validation.pipe';
 import { User } from '../user/user.decorator';
@@ -22,7 +23,7 @@ export class PhotoController {
 
   @Get()
   showAllPhotos(@Query('page') page: number) {
-    return this.photoService.showAll(page);
+    return this.photoService.showAll(page, true);
   }
 
   @Post()

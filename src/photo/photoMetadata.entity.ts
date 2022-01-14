@@ -5,11 +5,12 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { PhotoEntity } from './photo.entity';
 
-@Entity()
+@Entity('photo_metadata')
 export class PhotoMetadataEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column('int')
@@ -22,12 +23,14 @@ export class PhotoMetadataEntity {
   orientation: string;
 
   @Column()
-  compressed: string;
+  compressed: boolean;
 
   @Column()
   comment: string;
 
-  @OneToOne(type => PhotoEntity)
+  @OneToOne(type => PhotoEntity, photo => photo.metadata, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   photo: PhotoEntity;
 }
