@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 
@@ -15,6 +15,7 @@ import { CommentModule } from './comment/comment.module';
 import { ImagesModule } from './images/images.module';
 import { StripeModule } from './stripe/stripe.module';
 import { PhotoModule } from './photo/photo.module';
+import { RolesGuard } from './shared/roles.guard';
 
 @Module({
   imports: [

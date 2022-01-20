@@ -2,6 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 import { PhotoEntity } from '../photo/photo.entity';
 import { IdeaEntity } from '../idea/idea.entity';
+import { Role } from 'src/shared/role.enum';
 
 export class UserDTO {
   @IsNotEmpty()
@@ -9,6 +10,8 @@ export class UserDTO {
 
   @IsNotEmpty()
   password: string;
+
+  roles?: Role[];
 }
 
 export class UserRO {

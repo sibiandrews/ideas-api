@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserRO } from './user.dto';
 import { IdeaEntity } from '../idea/idea.entity';
 import { PhotoEntity } from '../photo/photo.entity';
+import { Role } from '../shared/role.enum';
 
 @Entity('user')
 export class UserEntity {
@@ -32,6 +33,9 @@ export class UserEntity {
   @Column('text')
   password: string;
 
+  @Column('text', { array: true, nullable: true })
+  roles: Role[];
+
   @OneToMany(type => IdeaEntity, idea => idea.author)
   ideas: IdeaEntity[];
 
@@ -48,8 +52,8 @@ export class UserEntity {
   }
 
   toResponseObject(showToken = true): UserRO {
-    const { id, created, username, token } = this;
-    const responseObject: any = { id, created, username };
+    const { id, created, username, token, roles } = this;
+    const responseObject: any = { id, created, username, roles };
     if (showToken) {
       responseObject.token = token;
     }
@@ -59,6 +63,9 @@ export class UserEntity {
     if (this.bookmarks) {
       responseObject.bookmarks = this.bookmarks;
     }
+    if (this.photos) {
+      responseObject.photos = this.photos;
+    }
     return responseObject;
   }
 
@@ -67,11 +74,12 @@ export class UserEntity {
   }
 
   private get token() {
-    const { id, username } = this;
+    const { id, username, roles } = this;
     return jwt.sign(
       {
         id,
         username,
+        roles,
       },
       process.env.SECRET,
       { expiresIn: '7d' },

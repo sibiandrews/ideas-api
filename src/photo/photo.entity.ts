@@ -35,7 +35,9 @@ export class PhotoEntity {
   @Column('double precision')
   views: number;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   isPublished: boolean;
 
   @OneToOne(type => PhotoMetadataEntity, metadata => metadata.photo, {

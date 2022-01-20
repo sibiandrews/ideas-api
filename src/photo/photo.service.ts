@@ -5,6 +5,7 @@ import { UserEntity } from '../user/user.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PhotoDTO, PhotoRO } from './photo.dto';
 import { PhotoEntity } from './photo.entity';
+import { PhotoMetadataEntity } from './photoMetadata.entity';
 
 @Injectable()
 export class PhotoService {
@@ -32,19 +33,45 @@ export class PhotoService {
   async showAll(page = 1, newest?: boolean): Promise<PhotoRO[]> {
     let query: SelectQueryBuilder<PhotoEntity> = this.photoRepository
       .createQueryBuilder('photo')
-      .innerJoinAndSelect('photo.metadata', 'metadata')
-      .innerJoinAndSelect('photo.author', 'author');
+      .leftJoinAndSelect('photo.metadata', 'metadata')
+      .leftJoinAndSelect('photo.author', 'author');
     if (newest) query = query.orderBy('photo.created', 'DESC');
     query = query.skip(25 * (page - 1)).take(25);
     const photos = await query.getMany();
     return photos.map(photo => this.toResponseObject(photo));
   }
 
-  async create(userId: string, data: PhotoDTO): Promise<PhotoRO> {
-    const user = await this.userRespository.findOne({ where: { id: userId } });
+  async create(userId: string, data: PhotoDTO) {
+    const user = await this.userRespository.findOne({
+      where: { id: userId },
+    });
     const photo = this.photoRepository.create({ ...data, author: user });
     await this.photoRepository.save(photo);
     return this.toResponseObject(photo);
+
+    const _user = await this.userRespository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id: userId })
+      .getOne();
+    const _photo = await this.photoRepository
+      .createQueryBuilder()
+      .insert()
+      .into(PhotoEntity)
+      .values({ ...data, author: _user, metadata: data.metadata })
+      .returning('*')
+      .execute();
+    const metadata = await this.photoRepository
+      .createQueryBuilder()
+      .insert()
+      .into(PhotoMetadataEntity)
+      .values({ ...data.metadata })
+      .execute();
+    await this.photoRepository
+      .createQueryBuilder()
+      .relation(PhotoEntity, 'metadata')
+      .of(_photo.generatedMaps[0]['id'])
+      .set(metadata.generatedMaps[0]['id']);
+    return _photo.generatedMaps[0];
   }
 
   async read(id: string): Promise<PhotoRO> {

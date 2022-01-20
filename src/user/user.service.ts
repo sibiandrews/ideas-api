@@ -6,6 +6,7 @@ import Stripe from 'stripe';
 import { UserDTO, UserRO } from './user.dto';
 import { UserEntity } from './user.entity';
 import { STRIPE_CLIENT } from '../stripe/constants';
+import { Role } from '../shared/role.enum';
 
 @Injectable()
 export class UserService {
@@ -17,7 +18,7 @@ export class UserService {
 
   async showAll(page = 1): Promise<UserRO[]> {
     const users = await this.userRepository.find({
-      relations: ['ideas', 'bookmarks'],
+      relations: ['ideas', 'bookmarks', 'photos'],
       take: 25,
       skip: 25 * (page - 1),
     });
@@ -28,6 +29,25 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { username },
       relations: ['ideas', 'bookmarks'],
+    });
+    return user.toResponseObject(false);
+  }
+
+  async readUserById(userId: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.photos', 'photo')
+      .leftJoinAndSelect('user.ideas', 'ideas')
+      .leftJoinAndSelect('user.bookmarks', 'bookmarks')
+      .where('user.id = :userId', { userId: userId })
+      .getOne();
+    return user.toResponseObject(false);
+  }
+
+  async setAdminRole(id: string) {
+    await this.userRepository.update({ id }, { roles: [Role.Admin] });
+    const user = await this.userRepository.findOne({
+      where: { id },
     });
     return user.toResponseObject(false);
   }
